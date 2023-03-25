@@ -1,10 +1,8 @@
 <?php
-
 namespace App\Http\Controllers;
 use \App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\facades\Validator;
-
 class userController extends Controller
 {
     public function register(Request $request){
@@ -12,8 +10,7 @@ class userController extends Controller
         $validator=validator::make($request->all(),[
             'email'=>'require | unique :users',
             'password'=>'require',
-            'name'=>'require',
-            
+            'name'=>'require',            
         ]);
         if($validator->fails()){
     
@@ -25,9 +22,6 @@ class userController extends Controller
         $p->password=encrypt($request->password); 
         $p->save();
         return response()->json(['message'=>["Sucessfully Registered"]]);
-
-
-      
     }
    public function login(Request $request){
 
