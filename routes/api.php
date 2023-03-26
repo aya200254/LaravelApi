@@ -1,17 +1,21 @@
 <?php
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-// product route
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\userController;
 
-Route::any('add', 'ProductController@add');
-Route::any('update', 'ProductController@update');
-Route::any('delete', 'ProductController@delete');
-Route::any('show', 'ProductController@show');
+// product routes
 
-//user
-Route::any('register', 'userController@register');
-Route::any('login', 'userController@login');
-// /*
+Route::post('/products', [ProductController::class,'add']);
+Route::put('/products', [ProductController::class,'update']);
+Route::delete('/products', [ProductController::class,'delete']);
+Route::get('/products', [ProductController::class,'show']);
+// user routes
+
+
+Route::post('/register', [UserController::class, 'register']);
+Route::post('/login', [UserController::class, 'login']);
+
 // |--------------------------------------------------------------------------
 // | API Routes
 // |--------------------------------------------------------------------------

@@ -1,119 +1,99 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\product;
-use Illuminate\Support\facades\Validator;
+use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
     public function add(Request $request){
 
-        $validator=validator::make($request->all(),[
-            'name'=>'require',
-            'category'=>'require',
-            'brand'=>'require',
-            'desc'=>'require',
-        
-            'image'=>'require |image ',
-            'imgpath'=>'require',
-            'price'=>'require',
-    
+        $validator=Validator::make($request->all(),[
+            'name'=>'required',
+            'category'=>'required',
+            'brand'=>'required',
+            'desc'=>'required',
+            'image'=>'required|image',
+            'price'=>'required'
         ]);
+
         if($validator->fails()){
-    
-            return response()->json(['Error'=>$validator->errors()->all()],status:409);
+            return response()->json(['error'=>$validator->errors()->all()], 409);
         }
-        $p=product::find($request->id);
-        $p->name=$request->name;
-        $p->category=$request->category; 
-        $p->brand=$request->brand; 
-        $p->desc=$request->desc;
-        $p->price=$request->price;
+
+        $p = new Product();
+        $p->name = $request->name;
+        $p->category = $request->category;
+        $p->brand = $request->brand;
+        $p->desc = $request->desc;
+        $p->price = $request->price;
         $p->save();
 
-        //storage image
-                    $url="http://127.0.0.1:8000/storage/";
-                    $file =$request->file(key: 'image');
-                    $extension= $file->getClientOriginalExtension();
-                    $path = $request->file(key: 'image')->storeAs(path: 'proimages/' , name: $p->id.'.'.$extension);
-                    $p->image=$path;
-                    $p->imgpath=$url.$path;
-                    $p->save();
+        //store Image
+        $url = "http://localhost:8000/storage/";
+        $file = $request->file('image');
+        $extention = $file->getClientOriginalExtension();
+        $path = $request->file('image')->storeAs('proimages/', $p->id.'.'.$extention);
+        $p->image = $path;
+        $p->imgpath = $url.$path;
+        $p->save();
+        return response()->json(['message'=>["Product Successfully added"]]);
+        // return response()->json(['message'=>["Successfully Registered"]]);
     }
-   public function update(Request $request){
 
-    $validator=validator::make($request->all(),[
-        'name'=>'require',
-        'category'=>'require',
-        'brand'=>'require',
-        'desc'=>'require',
-        'id'=>'require',
-        // 'image'=>'require |image ',
-        // 'imgpath'=>'require',
-        'price'=>'require',
+    public function update(Request $request){
 
-    ]);
-    if($validator->fails()){
+        $validator = Validator::make($request->all(),[
+            'name'=>'required',
+            'category'=>'required',
+            'brand'=>'required',
+            'desc'=>'required',
+            'id'=>'required',
+            'price'=>'required'
+        ]);
 
-        return response()->json(['Error'=>$validator->errors()->all()],status:409);
+        if($validator->fails()){
+            return response()->json(['error'=>$validator->errors()->all()], 409);
+        }
+
+        $p = Product::find($request->id);
+        $p->name = $request->name;
+        $p->category = $request->category;
+        $p->brand = $request->brand;
+        $p->desc = $request->desc;
+        $p->price = $request->price;
+        $p->save();
+
+        return response()->json(['message'=>["Product Successfully Updated"]]);
     }
-    $p=product::find($request->id);
-    $p->name=$request->name;
-    $p->category=$request->category; 
-    $p->brand=$request->brand; 
-    $p->desc=$request->desc;
-    $p->price=$request->price;
-    $p->save();
-    return response()->json(['message'=>' product sucessfully Updated']);
-    //storage image
-                // $url="http://127.0.0.1:8000/storage/";
-                // $file =$request->file(key: 'image');
-                // $extension= $file->getClientOriginalExtension();
-                // $path = $request->file(key: 'image')->storeAs(path: 'proimages/' , name: $p->id.'.'.$extension);
-                // $p->image=$path;
-                // $p->imgpath=$url.$path;
-                // $p->save();
 
-   }
+    public function delete(Request $request){
 
-   public function delete(Request $request){
+        $validator = Validator::make($request->all(),[
+            'id'=>'required'
+        ]);
 
-    $validator=validator::make($request->all(),[
-        
-        'id'=>'require',
-       
+        if($validator->fails()){
+            return response()->json(['error'=>$validator->errors()->all()], 409);
+        }
 
-    ]);
-    if($validator->fails()){
+        $p = Product::find($request->id)->delete();
 
-        return response()->json(['Error'=>$validator->errors()->all()],status:409);
+        return response()->json(['message'=>["Product Successfully Deleted"]]);
     }
-    $p=product::find($request->id)->delete();
 
-    $p->save();
-    return response()->json(['message'=>' product sucessfully Deleted']);
-    //storage image
-                // $url="http://127.0.0.1:8000/storage/";
-                // $file =$request->file(key: 'image');
-                // $extension= $file->getClientOriginalExtension();
-                // $path = $request->file(key: 'image')->storeAs(path: 'proimages/' , name: $p->id.'.'.$extension);
-                // $p->image=$path;
-                // $p->imgpath=$url.$path;
-                // $p->save();
+    public function show(Request $request){
 
-   }
+        session(['keys'=> $request->keys]);
+        $products = Product::where(function($q){
+            $q->where('products.id','LIKE','%'.session('keys').'%')
+              ->orWhere('products.name','LIKE','%'.session('keys').'%')
+              ->orWhere('products.price','LIKE','%'.session('keys').'%')
+              ->orWhere('products.category','LIKE','%'.session('keys').'%')
+              ->orWhere('products.brand','LIKE','%'.session('keys').'%');
+        })->select('products.*')->get();
 
-   public function show(Request $request){
-    session(['key'=>$request->keys]);
-    $products= product::where(function($q){
-        $q->where('products.id', 'LIKE', '%' .session(key:'key').'%')
-            ->orWhere('products.name', 'LIKE', '%' .session(key:'key').'%')
-            ->orWhere('products.price', 'LIKE', '%' .session(key:'key').'%')
-            ->orWhere('products.category', 'LIKE', '%' .session(key:'key').'%')
-            ->orWhere('products.brand', 'LIKE', '%' .session(key:'key').'%');
-    })->select('product.*')->get();
-    return response()->json(['products'=>$products]);
-}
-
+        return response()->json(['products'=>$products]);
+    }
 }
