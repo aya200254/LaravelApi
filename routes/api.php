@@ -6,12 +6,16 @@ use App\Http\Controllers\userController;
 
 // product routes
 
-Route::post('/products', [ProductController::class, 'add']);
-Route::put('/products', [ProductController::class, 'update']);
-Route::delete('/products', [ProductController::class, 'delete']);
-Route::get('/products', [ProductController::class, 'show']);
+// Route::post('/products', [ProductController::class, 'add']);
+// Route::put('/products', [ProductController::class, 'update']);
+// Route::delete('/products', [ProductController::class, 'delete']);
+// Route::get('/products', [ProductController::class, 'show']);
 // user routes
 
+Route::any('add', [ProductController::class, 'add']);
+Route::any('update', [ProductController::class, 'update']);
+Route::any('delete', [ProductController::class, 'delete']);
+Route::any('show', [ProductController::class,'show']);
 
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);

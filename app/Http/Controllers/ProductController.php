@@ -29,9 +29,8 @@ class ProductController extends Controller
         $p->desc = $request->desc;
         $p->price = $request->price;
         $p->save();
-
         //store Image
-        $url = "http://localhost:8000/storage/";
+        $url = "http://localhost:8000/storage/";   
         $file = $request->file('image');
         $extention = $file->getClientOriginalExtension();
         $path = $request->file('image')->storeAs('proimages/', $p->id.'.'.$extention);
@@ -39,7 +38,8 @@ class ProductController extends Controller
         $p->imgpath = $url.$path;
         $p->save();
 
-        return response()->json(['message'=>["Successfully Registered"]]);
+        // return response()->json(['message'=>["Successfully Registered"]]);
+        return response()->json(['message'=>["Successfully added"]]);
     }
 
     public function update(Request $request){
