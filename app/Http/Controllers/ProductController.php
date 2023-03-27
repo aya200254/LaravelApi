@@ -39,7 +39,8 @@ class ProductController extends Controller
         $p->imgpath = $url.$path;
         $p->save();
 
-        return response()->json(['message'=>["Successfully Registered"]]);
+        return response()->json(['message'=>["Product Successfully added"]]);
+
     }
 
     public function update(Request $request){
