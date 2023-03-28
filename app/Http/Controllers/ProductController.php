@@ -31,10 +31,11 @@ class ProductController extends Controller
         $p->save();
 
         //store Image
-        $url = "http://localhost:8000/storage/";
+        $url = "http://localhost:8000/image/";
         $file = $request->file('image');
         $extention = $file->getClientOriginalExtension();
-        $path = $request->file('image')->storeAs('proimages/', $p->id.'.'.$extention);
+        $path = $request->file('image')->storeAs( $p->id.'.'.$extention);
+        $request->image->move(public_path('image'),$path);
         $p->image = $path;
         $p->imgpath = $url.$path;
         $p->save();
